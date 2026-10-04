@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox spacing="15.0" stylesheets="@../css/style.css"
+      xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.agrolinkbd.agrolinkbd.ProductFormController">
+    <children>
+        <HBox alignment="CENTER_LEFT" spacing="15.0">
+            <children>
+                <Button mnemonicParsing="false" onAction="#handleCancel" text="← Back"
+                        styleClass="secondary-button" />
+                <Label fx:id="formTitle" text="Add New Crop" styleClass="header-label"
+                       HBox.hgrow="ALWAYS" maxWidth="Infinity" />
+            </children>
+        </HBox>
+
+        <GridPane hgap="20.0" vgap="12.0">
+            <columnConstraints>
+                <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0" />
+                <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0" />
+            </columnConstraints>
+
+            <Label text="Crop Type *" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+            <ComboBox fx:id="cropTypeCombo" promptText="Tomato / Onion / Rice / Potato..."
+                      maxWidth="Infinity" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+
+            <Label text="Crop Name *" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+            <TextField fx:id="cropNameField" promptText="e.g. Hybrid Tomato"
+                       GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+            <Label text="Available Quantity (KG) *" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+            <TextField fx:id="quantityField" promptText="Enter quantity in KG"
+                       GridPane.columnIndex="0" GridPane.rowIndex="3" />
+
+            <Label text="Price per KG (BDT) *" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <TextField fx:id="priceField" promptText="Enter price"
+                       GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+            <Label text="Harvest Date" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+            <DatePicker fx:id="harvestDatePicker" maxWidth="Infinity"
+                        GridPane.columnIndex="0" GridPane.rowIndex="5" />
+
+            <Label text="Pickup Location" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+            <TextField fx:id="pickupLocationField" promptText="Village / Upazila"
+                       GridPane.columnIndex="1" GridPane.rowIndex="5" />
+
+            <Label text="Description (Optional)" GridPane.columnIndex="0" GridPane.rowIndex="6"
+                   GridPane.columnSpan="2" />
+            <TextArea fx:id="descriptionArea" promptText="Extra details about this crop..."
+                      prefHeight="80.0" maxWidth="Infinity" wrapText="true"
+                      GridPane.columnIndex="0" GridPane.rowIndex="7" GridPane.columnSpan="2" />
+        </GridPane>
+
+        <Label fx:id="errorLabel" text="" style="-fx-text-fill: #e74c3c; -fx-font-size: 12px;" />
+
+        <HBox spacing="10.0" alignment="CENTER_RIGHT">
+            <children>
+                <Button mnemonicParsing="false" onAction="#handleCancel" text="Cancel"
+                        styleClass="secondary-button" />
+                <Button mnemonicParsing="false" onAction="#handleSave" text="💾 Save Crop"
+                        styleClass="primary-button" />
+            </children>
+        </HBox>
+    </children>
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+    </padding>
+</VBox>

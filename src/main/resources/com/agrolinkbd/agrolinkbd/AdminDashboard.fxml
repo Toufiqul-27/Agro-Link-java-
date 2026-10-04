@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="15.0" stylesheets="@../css/style.css"
+      xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.agrolinkbd.agrolinkbd.AdminController">
+
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+    </padding>
+
+    <children>
+        <HBox alignment="CENTER_LEFT" spacing="15.0">
+            <children>
+                <Label text="⚙️ Admin Dashboard" styleClass="header-label" HBox.hgrow="ALWAYS" maxWidth="Infinity" />
+                <Region HBox.hgrow="ALWAYS" />
+                <Button mnemonicParsing="false" onAction="#handleLogout" text="Logout" styleClass="secondary-button" />
+            </children>
+        </HBox>
+
+        <HBox spacing="15.0">
+            <children>
+                <VBox styleClass="card" spacing="5.0" HBox.hgrow="ALWAYS">
+                    <padding><Insets bottom="15.0" left="15.0" right="15.0" top="15.0" /></padding>
+                    <children>
+                        <Label text="Total Farmers" style="-fx-font-size: 12px; -fx-text-fill: #666;" />
+                        <Label fx:id="totalFarmersLabel" text="0" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #27ae60;" />
+                    </children>
+                </VBox>
+                <VBox styleClass="card" spacing="5.0" HBox.hgrow="ALWAYS">
+                    <padding><Insets bottom="15.0" left="15.0" right="15.0" top="15.0" /></padding>
+                    <children>
+                        <Label text="Total Buyers" style="-fx-font-size: 12px; -fx-text-fill: #666;" />
+                        <Label fx:id="totalBuyersLabel" text="0" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #2980b9;" />
+                    </children>
+                </VBox>
+                <VBox styleClass="card" spacing="5.0" HBox.hgrow="ALWAYS">
+                    <padding><Insets bottom="15.0" left="15.0" right="15.0" top="15.0" /></padding>
+                    <children>
+                        <Label text="Pending Approvals" style="-fx-font-size: 12px; -fx-text-fill: #666;" />
+                        <Label fx:id="pendingApprovalsLabel" text="0" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #e74c3c;" />
+                    </children>
+                </VBox>
+                <VBox styleClass="card" spacing="5.0" HBox.hgrow="ALWAYS">
+                    <padding><Insets bottom="15.0" left="15.0" right="15.0" top="15.0" /></padding>
+                    <children>
+                        <Label text="Total Orders" style="-fx-font-size: 12px; -fx-text-fill: #666;" />
+                        <Label fx:id="totalOrdersLabel" text="0" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #8e44ad;" />
+                    </children>
+                </VBox>
+            </children>
+        </HBox>
+
+        <TabPane fx:id="adminTabPane" VBox.vgrow="ALWAYS" tabClosingPolicy="UNAVAILABLE">
+            <tabs>
+                <Tab text="👨‍🌾 Farmer Approvals">
+                    <content>
+                        <VBox spacing="10.0">
+                            <padding><Insets bottom="10.0" left="10.0" right="10.0" top="10.0" /></padding>
+                            <children>
+                                <TableView fx:id="pendingFarmersTable" VBox.vgrow="ALWAYS" styleClass="table-view">
+                                    <columns>
+                                        <TableColumn fx:id="colFarmerId" prefWidth="70.0" text="ID" />
+                                        <TableColumn fx:id="colFarmerName" prefWidth="160.0" text="Full Name" />
+                                        <TableColumn fx:id="colFarmerNid" prefWidth="140.0" text="NID" />
+                                        <TableColumn fx:id="colFarmerPhone" prefWidth="130.0" text="Phone" />
+                                        <TableColumn fx:id="colFarmerLocation" prefWidth="150.0" text="Location" />
+                                        <TableColumn fx:id="colFarmerDate" prefWidth="130.0" text="Registered On" />
+                                    </columns>
+                                </TableView>
+                                <HBox spacing="10.0" alignment="CENTER_RIGHT">
+                                    <children>
+                                        <Button onAction="#handleApproveFarmer" text="✓ Approve" styleClass="primary-button" />
+                                        <Button onAction="#handleRejectFarmer" text="✗ Reject" styleClass="danger-button" />
+                                    </children>
+                                </HBox>
+                            </children>
+                        </VBox>
+                    </content>
+                </Tab>
+
+                <Tab text="👥 All Users">
+                    <content>
+                        <VBox spacing="10.0">
+                            <padding><Insets bottom="10.0" left="10.0" right="10.0" top="10.0" /></padding>
+                            <children>
+                                <HBox spacing="10.0" alignment="CENTER_LEFT">
+                                    <children>
+                                        <Label text="Filter by role:" />
+                                        <ComboBox fx:id="filterUserRole" prefWidth="140.0" />
+                                        <Button onAction="#handleFilterUsers" text="Filter" styleClass="primary-button" />
+                                    </children>
+                                </HBox>
+                                <TableView fx:id="usersTable" VBox.vgrow="ALWAYS" styleClass="table-view">
+                                    <columns>
+                                        <TableColumn fx:id="colUserId" prefWidth="60.0" text="ID" />
+                                        <TableColumn fx:id="colUserName" prefWidth="160.0" text="Name" />
+                                        <TableColumn fx:id="colUserPhone" prefWidth="130.0" text="Phone" />
+                                        <TableColumn fx:id="colUserRole" prefWidth="110.0" text="Role" />
+                                        <TableColumn fx:id="colUserLocation" prefWidth="150.0" text="Location" />
+                                        <TableColumn fx:id="colUserStatus" prefWidth="100.0" text="Status" />
+                                    </columns>
+                                </TableView>
+                                <HBox spacing="10.0" alignment="CENTER_RIGHT">
+                                    <children>
+                                        <Button onAction="#handleActivateUser" text="Activate" styleClass="primary-button" />
+                                        <Button onAction="#handleDeactivateUser" text="Deactivate" styleClass="danger-button" />
+                                    </children>
+                                </HBox>
+                            </children>
+                        </VBox>
+                    </content>
+                </Tab>
+
+                <Tab text="📦 All Orders">
+                    <content>
+                        <VBox spacing="10.0">
+                            <padding><Insets bottom="10.0" left="10.0" right="10.0" top="10.0" /></padding>
+                            <TableView fx:id="allOrdersTable" VBox.vgrow="ALWAYS" styleClass="table-view">
+                                <columns>
+                                    <TableColumn fx:id="colOrderId" prefWidth="70.0" text="ID" />
+                                    <TableColumn fx:id="colOrderCrop" prefWidth="140.0" text="Crop" />
+                                    <TableColumn fx:id="colOrderBuyer" prefWidth="130.0" text="Buyer" />
+                                    <TableColumn fx:id="colOrderFarmer" prefWidth="130.0" text="Farmer" />
+                                    <TableColumn fx:id="colOrderQty" prefWidth="90.0" text="Qty (KG)" />
+                                    <TableColumn fx:id="colOrderTotal" prefWidth="110.0" text="Total" />
+                                    <TableColumn fx:id="colOrderStatus" prefWidth="110.0" text="Status" />
+                                    <TableColumn fx:id="colOrderDate" prefWidth="120.0" text="Date" />
+                                </columns>
+                            </TableView>
+                        </VBox>
+                    </content>
+                </Tab>
+
+                <Tab text="🚛 Trucks">
+                    <content>
+                        <VBox spacing="10.0">
+                            <padding><Insets bottom="10.0" left="10.0" right="10.0" top="10.0" /></padding>
+                            <HBox alignment="CENTER_RIGHT">
+                                <Button onAction="#handleAddTruck" text="+ Add Truck" styleClass="primary-button" />
+                            </HBox>
+                            <TableView fx:id="trucksTable" VBox.vgrow="ALWAYS" styleClass="table-view">
+                                <columns>
+                                    <TableColumn fx:id="colTruckId" prefWidth="70.0" text="ID" />
+                                    <TableColumn fx:id="colTruckRoute" prefWidth="200.0" text="Route" />
+                                    <TableColumn fx:id="colTruckCapacity" prefWidth="130.0" text="Capacity" />
+                                    <TableColumn fx:id="colTruckCost" prefWidth="130.0" text="Cost/KG" />
+                                    <TableColumn fx:id="colTruckStatus" prefWidth="110.0" text="Status" />
+                                </columns>
+                            </TableView>
+                            <HBox alignment="CENTER_RIGHT">
+                                <Button onAction="#handleRemoveTruck" text="Remove Truck" styleClass="danger-button" />
+                            </HBox>
+                        </VBox>
+                    </content>
+                </Tab>
+            </tabs>
+        </TabPane>
+    </children>
+</VBox>

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox alignment="CENTER" spacing="15.0" stylesheets="@../css/style.css"
+      xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.agrolinkbd.agrolinkbd.RegisterController">
+    <children>
+        <Label text="🌾 AgroLink BD" styleClass="header-label" />
+        <Label text="Create a new account" style="-fx-font-size: 14px; -fx-text-fill: #666;" />
+
+        <VBox spacing="12.0" styleClass="card" maxWidth="460.0">
+            <children>
+                <GridPane hgap="15.0" vgap="10.0" maxWidth="Infinity">
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0" />
+                        <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0" />
+                    </columnConstraints>
+
+                    <Label text="Full Name *" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                    <Label text="NID Number *" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                    <TextField fx:id="nameField" promptText="Enter full name"
+                               GridPane.columnIndex="0" GridPane.rowIndex="1" maxWidth="Infinity" />
+                    <TextField fx:id="nidField" promptText="Enter NID number"
+                               GridPane.columnIndex="1" GridPane.rowIndex="1" maxWidth="Infinity" />
+
+                    <Label text="Phone Number *" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                    <Label text="Location (Upazila) *" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                    <TextField fx:id="phoneField" promptText="01XXXXXXXXX"
+                               GridPane.columnIndex="0" GridPane.rowIndex="3" maxWidth="Infinity" />
+                    <TextField fx:id="locationField" promptText="e.g. Savar, Dhaka"
+                               GridPane.columnIndex="1" GridPane.rowIndex="3" maxWidth="Infinity" />
+
+                    <Label text="Select Role *" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+                    <ComboBox fx:id="roleCombo" promptText="Farmer / Buyer / Arotdar" maxWidth="Infinity"
+                              GridPane.columnIndex="0" GridPane.rowIndex="5" GridPane.columnSpan="2" />
+
+                    <Label text="Password *" GridPane.columnIndex="0" GridPane.rowIndex="6"
+                           GridPane.columnSpan="2" />
+                    <PasswordField fx:id="passwordField" promptText="Enter password" maxWidth="Infinity"
+                                   GridPane.columnIndex="0" GridPane.rowIndex="7" GridPane.columnSpan="2" />
+
+                    <Label text="Confirm Password *" GridPane.columnIndex="0" GridPane.rowIndex="8"
+                           GridPane.columnSpan="2" />
+                    <PasswordField fx:id="confirmPasswordField" promptText="Re-enter password"
+                                   maxWidth="Infinity"
+                                   GridPane.columnIndex="0" GridPane.rowIndex="9" GridPane.columnSpan="2" />
+                </GridPane>
+
+                <Label fx:id="errorLabel" text="" style="-fx-text-fill: #e74c3c; -fx-font-size: 12px;" />
+
+                <Button mnemonicParsing="false" onAction="#handleRegister" text="Create Account"
+                        styleClass="primary-button" maxWidth="Infinity" />
+
+                <HBox alignment="CENTER" spacing="5.0">
+                    <children>
+                        <Label text="Already have an account?" />
+                        <Button mnemonicParsing="false" onAction="#goToLogin" text="Login"
+                                styleClass="link-button" />
+                    </children>
+                </HBox>
+            </children>
+            <padding>
+                <Insets bottom="25.0" left="25.0" right="25.0" top="25.0" />
+            </padding>
+        </VBox>
+    </children>
+    <padding>
+        <Insets bottom="30.0" left="40.0" right="40.0" top="30.0" />
+    </padding>
+</VBox>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox spacing="10.0" stylesheets="@../css/style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.agrolinkbd.agrolinkbd.AddTruckController">
+    <padding><Insets bottom="20.0" left="20.0" right="20.0" top="20.0" /></padding>
+    <Label text="Add New Truck Route" styleClass="header-label" />
+    <TextField fx:id="routeField" promptText="Route (e.g. Savar to Dhaka)" />
+    <TextField fx:id="capacityField" promptText="Capacity (KG)" />
+    <TextField fx:id="costField" promptText="Cost per KG" />
+    <DatePicker fx:id="datePicker" promptText="Departure Date" maxWidth="Infinity" />
+    <Button text="Save Truck" onAction="#handleSave" styleClass="primary-button" maxWidth="Infinity" />
+</VBox>

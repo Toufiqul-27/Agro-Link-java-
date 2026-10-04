@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox spacing="15.0" stylesheets="@../css/style.css"
+      xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.agrolinkbd.agrolinkbd.TruckController">
+    <children>
+        <HBox alignment="CENTER_LEFT" spacing="15.0">
+            <children>
+                <Button mnemonicParsing="false" onAction="#goBack" text="← Back"
+                        styleClass="secondary-button" />
+                <Label text="🚛 Shared Truck Booking" styleClass="header-label"
+                       HBox.hgrow="ALWAYS" maxWidth="Infinity" />
+                <Region HBox.hgrow="ALWAYS" />
+                <Button mnemonicParsing="false" onAction="#handleLogout" text="Logout"
+                        styleClass="secondary-button" />
+            </children>
+        </HBox>
+
+        <HBox spacing="15.0" VBox.vgrow="ALWAYS">
+            <children>
+                <VBox spacing="12.0" styleClass="card" prefWidth="290.0">
+                    <children>
+                        <Label text="New Booking" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+
+                        <Label text="Select Route (Destination)" />
+                        <ComboBox fx:id="routeCombo" promptText="Choose destination" maxWidth="Infinity" />
+
+                        <Label text="Your Pickup Location" />
+                        <TextField fx:id="pickupField" promptText="Village / Upazila" />
+
+                        <Label text="Cargo Weight (KG)" />
+                        <TextField fx:id="weightField" promptText="Enter weight in KG" />
+
+                        <Label text="Preferred Date" />
+                        <DatePicker fx:id="bookingDatePicker" maxWidth="Infinity" />
+
+                        <Separator />
+
+                        <HBox spacing="10.0" alignment="CENTER_LEFT">
+                            <children>
+                                <Label text="Your Cost Share:" style="-fx-font-weight: bold;" />
+                                <Label fx:id="costShareLabel" text="-- BDT"
+                                       style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #27ae60;" />
+                            </children>
+                        </HBox>
+
+                        <Label fx:id="errorLabel" text="" style="-fx-text-fill: #e74c3c; -fx-font-size: 12px;" />
+
+                        <Button mnemonicParsing="false" onAction="#handleCalculateCost"
+                                text="Calculate My Cost Share" styleClass="secondary-button"
+                                maxWidth="Infinity" />
+                        <Button mnemonicParsing="false" onAction="#handleBookTruck"
+                                text="✅ Confirm Booking" styleClass="primary-button"
+                                maxWidth="Infinity" />
+                    </children>
+                    <padding>
+                        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                    </padding>
+                </VBox>
+
+                <VBox spacing="10.0" HBox.hgrow="ALWAYS">
+                    <children>
+                        <Label text="Available Trucks:" style="-fx-font-size: 15px; -fx-font-weight: bold;" />
+                        <TableView fx:id="trucksTable" VBox.vgrow="ALWAYS" styleClass="table-view">
+                            <columns>
+                                <TableColumn fx:id="colRoute" prefWidth="160.0" text="Route" />
+                                <TableColumn fx:id="colCapacity" prefWidth="110.0" text="Capacity (KG)" />
+                                <TableColumn fx:id="colCostPerKg" prefWidth="110.0" text="Cost/KG (BDT)" />
+                                <TableColumn fx:id="colBookedWeight" prefWidth="120.0" text="Booked (KG)" />
+                                <TableColumn fx:id="colAvailableSpace" prefWidth="115.0" text="Free Space (KG)" />
+                                <TableColumn fx:id="colDate" prefWidth="100.0" text="Date" />
+                            </columns>
+                        </TableView>
+
+                        <Label text="My Bookings:" style="-fx-font-size: 15px; -fx-font-weight: bold;" />
+                        <TableView fx:id="myBookingsTable" prefHeight="170.0" styleClass="table-view">
+                            <columns>
+                                <TableColumn fx:id="colBookingId" prefWidth="80.0" text="ID" />
+                                <TableColumn fx:id="colBookingRoute" prefWidth="160.0" text="Route" />
+                                <TableColumn fx:id="colBookingWeight" prefWidth="100.0" text="Weight (KG)" />
+                                <TableColumn fx:id="colBookingCost" prefWidth="110.0" text="My Cost (BDT)" />
+                                <TableColumn fx:id="colBookingDate" prefWidth="100.0" text="Date" />
+                                <TableColumn fx:id="colBookingStatus" prefWidth="100.0" text="Status" />
+                            </columns>
+                        </TableView>
+                    </children>
+                </VBox>
+            </children>
+        </HBox>
+    </children>
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+    </padding>
+</VBox>

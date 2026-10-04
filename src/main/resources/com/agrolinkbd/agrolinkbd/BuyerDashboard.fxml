@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox spacing="15.0" stylesheets="@../css/style.css"
+      xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.agrolinkbd.agrolinkbd.BuyerController">
+    <children>
+        <HBox alignment="CENTER_LEFT" spacing="15.0">
+            <children>
+                <Label text="Buyer Dashboard" styleClass="header-label"
+                       HBox.hgrow="ALWAYS" maxWidth="Infinity" />
+                <Region HBox.hgrow="ALWAYS" />
+                <Button mnemonicParsing="false" onAction="#goToMyOrders" text="📦 My Orders"
+                        styleClass="secondary-button" />
+                <Button mnemonicParsing="false" onAction="#goToTruckBooking" text="🚛 Book Truck"
+                        styleClass="secondary-button" />
+                <Button mnemonicParsing="false" onAction="#handleLogout" text="Logout"
+                        styleClass="secondary-button" />
+            </children>
+        </HBox>
+
+        <HBox spacing="10.0" alignment="CENTER_LEFT" styleClass="card">
+            <children>
+                <Label text="Filter:" style="-fx-font-weight: bold;" />
+                <ComboBox fx:id="filterCropType" promptText="All Crop Types" prefWidth="160.0" />
+                <TextField fx:id="filterRegion" promptText="Region / Upazila" prefWidth="170.0" />
+                <TextField fx:id="filterMaxPrice" promptText="Max Price (BDT)" prefWidth="150.0" />
+                <Button mnemonicParsing="false" onAction="#handleFilter" text="🔍 Search"
+                        styleClass="primary-button" />
+                <Button mnemonicParsing="false" onAction="#handleClearFilter" text="Clear"
+                        styleClass="secondary-button" />
+            </children>
+            <padding>
+                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+            </padding>
+        </HBox>
+
+        <Label text="Available Crops:" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+        <TableView fx:id="productsTable" VBox.vgrow="ALWAYS" styleClass="table-view">
+            <columns>
+                <TableColumn fx:id="colCropName" prefWidth="170.0" text="Crop Name" />
+                <TableColumn fx:id="colPrice" prefWidth="130.0" text="Price/KG (BDT)" />
+                <TableColumn fx:id="colStock" prefWidth="120.0" text="Stock (KG)" />
+                <TableColumn fx:id="colFarmer" prefWidth="140.0" text="Farmer" />
+                <TableColumn fx:id="colLocation" prefWidth="140.0" text="Location" />
+                <TableColumn fx:id="colHarvestDate" prefWidth="120.0" text="Harvest Date" />
+            </columns>
+        </TableView>
+
+        <HBox spacing="10.0" alignment="CENTER_RIGHT">
+            <children>
+                <Label text="Order Qty (KG):" style="-fx-font-weight: bold;" />
+                <TextField fx:id="orderQtyField" promptText="Enter KG" prefWidth="120.0" />
+                <Button mnemonicParsing="false" onAction="#handlePlaceOrder" text="🛒 Place Order"
+                        styleClass="primary-button" />
+            </children>
+        </HBox>
+    </children>
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+    </padding>
+</VBox>
