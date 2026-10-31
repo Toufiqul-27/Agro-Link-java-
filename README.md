@@ -35,7 +35,24 @@ src/main/
 
 1. Install **JDK 25**, **Maven** (or use the included Maven wrapper) and a local **MySQL** server. The project currently targets Java 25 in `pom.xml`.
 2. Create a local MySQL database named `agrolink_db` and configure the database tables used by the application. **A database schema/migration script is not yet included in this repository.**
-3. Review the connection configuration in `Database.java` for your local environment.
+3. Set environment variables for the MySQL connection (do not commit the values):
+
+   **PowerShell:**
+
+   ```powershell
+   $env:AGROLINK_DB_USER = "your_mysql_user"
+   $env:AGROLINK_DB_PASSWORD = "your_local_mysql_password"
+   $env:AGROLINK_DB_URL = "jdbc:mysql://localhost:3306/agrolink_db"
+   ```
+
+   **macOS / Linux:**
+
+   ```bash
+   export AGROLINK_DB_USER="your_mysql_user"
+   export AGROLINK_DB_PASSWORD="your_local_mysql_password"
+   export AGROLINK_DB_URL="jdbc:mysql://localhost:3306/agrolink_db"
+   ```
+
 4. From the repository root, run:
 
 ```bash
@@ -44,12 +61,12 @@ src/main/
 
 On Windows PowerShell, use `./mvnw.cmd clean javafx:run`.
 
-**Security note:** Database credentials should not be committed to source control. Migrate connection settings to environment variables and rotate any credentials already committed before deploying or sharing access. Never commit real production credentials.
+**Security note:** Database credentials are now read from `AGROLINK_DB_USER`, `AGROLINK_DB_PASSWORD` and optional `AGROLINK_DB_URL`. A password was previously committed: **rotate it now**. Old commits may still expose it until repository history is carefully cleaned. Never commit real credentials.
 
 ## What I want to improve
 
 - Add a reproducible database setup script.
-- Externalize database credentials and add safer configuration handling.
+- Review and clean credential exposure in earlier Git history after rotating the password.
 - Improve form validation, automated tests and error handling.
 - Add screenshots and a short demo of the application workflow.
 
