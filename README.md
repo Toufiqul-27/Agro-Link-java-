@@ -1,3 +1,9 @@
+<div align="center">
+  <img src="https://raw.githubusercontent.com/Toufiqul-27/portfolio-1/main/assets/github-banner.svg" alt="Toufiqul Islam developer banner" width="100%"/>
+</div>
+
+---
+
 # AgroLink BD
 
 **AgroLink BD** is a JavaFX desktop application exploring how farmers, buyers and administrators can manage agricultural products, orders and shared truck bookings in one place.
