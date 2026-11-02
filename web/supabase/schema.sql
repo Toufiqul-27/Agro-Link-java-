@@ -89,8 +89,9 @@ ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.trucks ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.truck_bookings ENABLE ROW LEVEL SECURITY;
 
--- Profile name, role and district are deliberately public to support market transparency.
-CREATE POLICY profiles_public_read ON public.profiles FOR SELECT USING (true);
+-- Farmer public names and districts support product attribution; other profiles are private to their owners.
+CREATE POLICY profiles_public_read ON public.profiles FOR SELECT
+  USING (role = 'farmer' OR id = auth.uid());
 
 CREATE POLICY listings_public_read ON public.listings FOR SELECT
   USING (status = 'active' OR farmer_id = auth.uid());
@@ -113,7 +114,7 @@ CREATE POLICY orders_participants_read ON public.orders FOR SELECT TO authentica
 CREATE POLICY trucks_public_read ON public.trucks FOR SELECT
   USING (status = 'active' OR owner_id = auth.uid());
 CREATE POLICY trucks_driver_insert ON public.trucks FOR INSERT TO authenticated
-  WITH CHECK (owner_id = auth.uid() AND
+  WITH CHECK (owner_id = auth.uid() AND departure_date >= CURRENT_DATE AND
     EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'transporter'));
 -- No direct UPDATE / DELETE policy on trucks to prevent tampering with reservations.
 
