@@ -216,3 +216,38 @@ REVOKE ALL ON FUNCTION public.reserve_truck(uuid,integer) FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION public.place_order(uuid,integer) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.change_order_status(uuid,text) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.reserve_truck(uuid,integer) TO authenticated;
+
+
+-- Private order discussion. Participants can coordinate without sharing their email or NID.
+CREATE TABLE IF NOT EXISTS public.order_messages (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  order_id uuid NOT NULL REFERENCES public.orders(id) ON DELETE CASCADE,
+  sender_id uuid NOT NULL REFERENCES public.profiles(id) ON DELETE RESTRICT,
+  body text NOT NULL CHECK (char_length(trim(body)) BETWEEN 1 AND 600),
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS order_messages_thread_idx
+  ON public.order_messages(order_id, created_at);
+
+CREATE OR REPLACE FUNCTION public.is_order_participant(p_order_id uuid)
+RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path = ''
+AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM public.orders o
+    JOIN public.listings l ON l.id = o.listing_id
+    WHERE o.id = p_order_id AND
+      (o.buyer_id = auth.uid() OR l.farmer_id = auth.uid())
+  );
+$$;
+
+REVOKE ALL ON FUNCTION public.is_order_participant(uuid) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.is_order_participant(uuid) TO authenticated;
+
+ALTER TABLE public.order_messages ENABLE ROW LEVEL SECURITY;
+CREATE POLICY order_messages_participants_read
+  ON public.order_messages FOR SELECT TO authenticated
+  USING (public.is_order_participant(order_id));
+CREATE POLICY order_messages_participants_write
+  ON public.order_messages FOR INSERT TO authenticated
+  WITH CHECK (sender_id = auth.uid() AND public.is_order_participant(order_id));
+-- No UPDATE or DELETE policies: messages form an append-only discussion history.

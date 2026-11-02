@@ -1,6 +1,6 @@
 # AgroLink BD — Web MVP
 
-A modern, mobile-friendly agricultural marketplace for Bangladesh: farmers list harvests, buyers place orders and reserve shared truck space, and transporters publish routes. This is a **functional student-built MVP**, not a production logistics business.
+A modern, mobile-friendly agricultural marketplace for Bangladesh: farmers list harvests, buyers place orders and reserve shared truck space, and transporters publish routes. Buyers and farmers can coordinate through private order messages. This is a **functional student-built MVP**, not a production logistics business.
 
 ## Tech stack
 
@@ -16,12 +16,12 @@ The older JavaFX/MySQL desktop project remains at the repository root and is ind
 | User | Capabilities |
 | --- | --- |
 | Visitor | View active product listings and filter by crop / district |
-| Farmer | Sign up, sign in, publish harvests, view received orders, confirm/dispatch orders, reserve truck capacity |
-| Buyer | Sign up, place orders (with stock locking), cancel pending orders (restocks automatically), reserve truck space |
+| Farmer | Sign up, sign in, publish harvests, view received orders, reply to buyer messages, confirm/dispatch orders, reserve truck capacity |
+| Buyer | Sign up, place orders (with stock locking), cancel pending orders (restocks automatically), message sellers privately, reserve truck space |
 | Transporter | Sign up, publish dated truck routes, see bookings on their routes |
 | All members | Responsive dashboard with role-relevant views |
 
-Order creation, cancellation and truck reservations use atomic PostgreSQL functions to prevent overselling/overbooking. Row-level policies prevent other users from changing data they do not own.
+Order discussions have participant-only read/write database policies so unrelated accounts cannot read them. Order creation, cancellation and truck reservations use atomic PostgreSQL functions to prevent overselling/overbooking. Row-level policies prevent other users from changing data they do not own.
 
 **Current limitations:** email login only, manually coordinated payment/collection, no GPS tracking, mobile money, SMS, escrow, delivery guarantees, ratings, order chat or image uploads. Do not use real NIDs or sensitive personal data.
 
@@ -74,9 +74,12 @@ No live deployment is created until you connect a Vercel project and provide **y
 - Transporter creates Dhaka → Gazipur route, capacity 500 kg. Farmer reserves 60 kg; remaining 440 kg.
 - Attempt to book 500 more kg must fail without changing the record.
 - Buyer cannot insert another farmer's listing; farmer cannot place buyer orders. RLS policies protect these cases.
+- Buyer and farmer can exchange private order messages; unrelated users cannot access the thread.
 - Check screens at 375px mobile and on desktop; verify empty-state handling.
 
 All figures above are **manual test examples**, not assertions that production data exists.
+
+If your development database was initialized using an older copy of schema.sql, apply the new `order_messages` table, function and policies from the end of the updated schema separately. Do not rerun all policy CREATE statements on an existing database.
 
 ## Production roadmap
 

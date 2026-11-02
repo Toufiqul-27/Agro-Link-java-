@@ -6,12 +6,12 @@ import { useRouter } from "next/navigation";
 import {
   ArrowRight, ArrowUpRight, Box, CalendarDays, CheckCircle2,
   ChevronRight, CircleAlert, LayoutDashboard, LogOut, MapPin,
-  Package, Plus, RefreshCw, ShoppingBasket, Sprout, Truck as TruckIcon, Wallet
+  Package, Plus, RefreshCw, ShoppingBasket, Sprout, Truck as TruckIcon, Wallet, MessageCircle, Send
 } from "lucide-react";
 import { getSupabase, isConfigured } from "@/lib/supabase";
 import {
   CATEGORIES, DISTRICTS, cropEmoji, taka,
-  type Listing, type Order, type Profile, type Truck, type TruckBooking
+  type Listing, type Order, type OrderMessage, type Profile, type Truck, type TruckBooking
 } from "@/lib/types";
 
 type Tab = "market" | "listings" | "orders" | "transport";
@@ -32,6 +32,9 @@ export default function Dashboard() {
   const [tab, setTab] = useState<Tab>("market");
   const [allListings, setAllListings] = useState<Listing[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
+  const [messages, setMessages] = useState<OrderMessage[]>([]);
+  const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
+  const [draftMessage, setDraftMessage] = useState("");
   const [trucks, setTrucks] = useState<Truck[]>([]);
   const [bookings, setBookings] = useState<TruckBooking[]>([]);
   const [cropForm, setCropForm] = useState(false);
@@ -42,17 +45,19 @@ export default function Dashboard() {
   const refresh = useCallback(async () => {
     if (!isConfigured()) return;
     const sb = getSupabase();
-    const [crops, existingOrders, routes, reservations] = await Promise.all([
+    const [crops, existingOrders, routes, reservations, discussion] = await Promise.all([
       sb.from("listings").select("*, profiles(full_name,district)").order("created_at", { ascending: false }).limit(100),
       sb.from("orders").select("*, listings(crop_name,farmer_id)").order("created_at", { ascending: false }).limit(100),
       sb.from("trucks").select("*").order("departure_date", { ascending: true }).limit(100),
-      sb.from("truck_bookings").select("*, trucks(origin,destination,owner_id)").order("created_at", { ascending: false }).limit(100)
+      sb.from("truck_bookings").select("*, trucks(origin,destination,owner_id)").order("created_at", { ascending: false }).limit(100),
+      sb.from("order_messages").select("*").order("created_at", { ascending: true }).limit(400)
     ]);
-    const firstError = [crops.error, existingOrders.error, routes.error, reservations.error].find(Boolean);
+    const firstError = [crops.error, existingOrders.error, routes.error, reservations.error, discussion.error].find(Boolean);
     if (firstError) setError("Unable to load data. Confirm that web/supabase/schema.sql has been applied to Supabase.");
     else setError("");
     setAllListings((crops.data ?? []) as unknown as Listing[]);
     setOrders((existingOrders.data ?? []) as unknown as Order[]);
+    setMessages((discussion.data ?? []) as unknown as OrderMessage[]);
     setTrucks((routes.data ?? []) as unknown as Truck[]);
     setBookings((reservations.data ?? []) as unknown as TruckBooking[]);
   }, []);
@@ -169,6 +174,30 @@ export default function Dashboard() {
     }), "Order status updated.");
   }
 
+  async function sendMessage(event: FormEvent<HTMLFormElement>, orderId: string) {
+    event.preventDefault();
+    const body = draftMessage.trim();
+    if (body.length === 0 || body.length > 600) {
+      setError("Message must contain 1–600 characters.");
+      return;
+    }
+    setBusy(true);
+    setError("");
+    setNotice("");
+    try {
+      const { error: insertError } = await getSupabase().from("order_messages")
+        .insert({ order_id: orderId, sender_id: userId, body });
+      if (insertError) throw new Error(insertError.message);
+      setDraftMessage("");
+      setNotice("Message sent.");
+      await refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unable to send message.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function signOut() {
     await getSupabase().auth.signOut();
     router.push("/");
@@ -283,6 +312,33 @@ export default function Dashboard() {
                       <button disabled={busy} type="button" onClick={()=>void updateOrder(order,"confirmed")}>Confirm</button>}
                     {profile.role === "farmer" && order.status === "confirmed" &&
                       <button disabled={busy} type="button" onClick={()=>void updateOrder(order,"dispatched")}>Dispatched</button>}
+                  </div>
+                  <div className="order-thread">
+                    <button type="button" className="order-chat-trigger"
+                      onClick={() => { setExpandedOrder(expandedOrder === order.id ? null : order.id); setDraftMessage(""); }}
+                      aria-expanded={expandedOrder === order.id}>
+                      <MessageCircle size={16} />
+                      {expandedOrder === order.id ? "Hide discussion" : "Discuss this order"}
+                    </button>
+                    {expandedOrder === order.id && <div className="order-chat">
+                      <div className="chat-messages" role="log" aria-label="Private order discussion">
+                        {messages.filter(m => m.order_id === order.id).length === 0 ?
+                          <p className="chat-empty">No messages yet. Discuss pickup, quality and fulfilment here without sharing private account details.</p> :
+                          messages.filter(m => m.order_id === order.id).map(m =>
+                            <div key={m.id} className={"chat-bubble " + (m.sender_id === userId ? "mine" : "theirs")}>
+                              <small>{m.sender_id === userId ? "You" : "Other participant"} · {new Date(m.created_at).toLocaleString("en-BD")}</small>
+                              <p>{m.body}</p>
+                            </div>
+                          )}
+                      </div>
+                      <form className="chat-form" onSubmit={e => void sendMessage(e, order.id)}>
+                        <textarea aria-label="Write a private order message" placeholder="Ask about pickup, grading or delivery details…"
+                          required minLength={1} maxLength={600} rows={2}
+                          value={draftMessage} onChange={e => setDraftMessage(e.target.value)} />
+                        <button type="submit" disabled={busy || !draftMessage.trim()}
+                          className="button button-dark button-small">Send <Send size={15}/></button>
+                      </form>
+                    </div>}
                   </div>
                 </article>)}</div>
             </>}

@@ -7,7 +7,7 @@ A Bangladesh-focused agriculture marketplace and shared transport project.
 A modern **Next.js 16 + Supabase PostgreSQL** web MVP is available in **[web/](web/)**.
 
 - Mobile-friendly public crop marketplace and role-based dashboards
-- Farmer listings and buyer orders
+- Farmer listings, buyer orders and private order discussions
 - Shared transport route discovery and capacity booking
 - Supabase Auth, row-level security and transaction-safe SQL operations
 - GitHub Actions web build and Vercel deployment instructions

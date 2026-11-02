@@ -44,6 +44,14 @@ export type Order = {
   listings?: { crop_name: string; farmer_id: string } | null;
 };
 
+export type OrderMessage = {
+  id: string;
+  order_id: string;
+  sender_id: string;
+  body: string;
+  created_at: string;
+};
+
 export type TruckBooking = {
   id: string;
   truck_id: string;
