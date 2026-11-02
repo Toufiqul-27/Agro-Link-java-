@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import {
   ArrowRight, ArrowUpRight, Box, CalendarDays, CheckCircle2,
   ChevronRight, CircleAlert, LayoutDashboard, LogOut, MapPin,
-  Package, Plus, RefreshCw, ShoppingBasket, Sprout, Truck, Wallet
+  Package, Plus, RefreshCw, ShoppingBasket, Sprout, Truck as TruckIcon, Wallet
 } from "lucide-react";
 import { getSupabase, isConfigured } from "@/lib/supabase";
 import {
@@ -32,7 +32,7 @@ export default function Dashboard() {
   const [tab, setTab] = useState<Tab>("market");
   const [allListings, setAllListings] = useState<Listing[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
-  const [trucks, setTrucks] = useState<Truck[]>([]);
+  const [trucks, setTrucks] = useState<TruckIcon[]>([]);
   const [bookings, setBookings] = useState<TruckBooking[]>([]);
   const [cropForm, setCropForm] = useState(false);
   const [truckForm, setTruckForm] = useState(false);
@@ -182,7 +182,7 @@ export default function Dashboard() {
     { label: "Marketplace", value: "market", icon: ShoppingBasket },
     ...(profile.role === "farmer" ? [{ label: "My harvests", value: "listings" as Tab, icon: Sprout }] : []),
     ...(profile.role !== "transporter" ? [{ label: "My orders", value: "orders" as Tab, icon: Package }] : []),
-    { label: "Transport", value: "transport", icon: Truck }
+    { label: "Transport", value: "transport", icon: TruckIcon }
   ];
   const visibleListings = allListings.filter(item => item.status === "active" && item.stock_kg > 0);
   const myListings = allListings.filter(item => item.farmer_id === userId);
@@ -211,7 +211,7 @@ export default function Dashboard() {
           <div><span className="stat-icon green"><LayoutDashboard size={20}/></span><small>Your role</small><strong className="capitalize">{profile.role}</strong></div>
           <div><span className="stat-icon gold"><Box size={20}/></span><small>{profile.role === "farmer" ? "My produce" : profile.role === "transporter" ? "My routes" : "Available produce"}</small><strong>{profile.role === "farmer" ? myListings.length : profile.role === "transporter" ? myTrucks.length : visibleListings.length}</strong></div>
           <div><span className="stat-icon violet"><ShoppingBasket size={20}/></span><small>{profile.role === "transporter" ? "Truck reservations" : "Orders"}</small><strong>{profile.role === "transporter" ? visibleBookings.length : visibleOrders.length}</strong></div>
-          <div><span className="stat-icon blue"><Truck size={20}/></span><small>Open truck routes</small><strong>{activeTrucks.length}</strong></div>
+          <div><span className="stat-icon blue"><TruckIcon size={20}/></span><small>Open truck routes</small><strong>{activeTrucks.length}</strong></div>
         </div>
         <div className="dashboard-layout">
           <aside className="dashboard-sidebar" aria-label="Dashboard sections">
@@ -304,7 +304,7 @@ export default function Dashboard() {
                 {(profile.role==="transporter"?myTrucks:activeTrucks).length===0?
                   <div className="small-empty">No truck routes available right now.</div> :
                   (profile.role==="transporter"?myTrucks:activeTrucks).map(truck=><div className="route-card" key={truck.id}>
-                    <div className="route-icon"><Truck size={24}/><span><CalendarDays size={13}/>{truck.departure_date}</span></div>
+                    <div className="route-icon"><TruckIcon size={24}/><span><CalendarDays size={13}/>{truck.departure_date}</span></div>
                     <div className="route-locations"><strong>{truck.origin}</strong><ArrowRight size={19}/><strong>{truck.destination}</strong></div>
                     <div className="route-stats"><span><small>AVAILABLE</small><b>{truck.capacity_kg-truck.reserved_kg} kg</b></span><span><small>RATE</small><b>{taka(truck.price_per_kg)} /kg</b></span></div>
                     {profile.role!=="transporter" &&
@@ -318,7 +318,7 @@ export default function Dashboard() {
               <h3 className="subheading">{profile.role==="transporter"?"Reservations on your routes":"Your truck reservations"}</h3>
               <div className="orders-list">{visibleBookings.length===0?<div className="small-empty">No reservations recorded yet.</div>:
                 visibleBookings.map(book=><div className="booking-row" key={book.id}>
-                  <span><Truck size={18}/><strong>{book.trucks?.origin} → {book.trucks?.destination}</strong></span>
+                  <span><TruckIcon size={18}/><strong>{book.trucks?.origin} → {book.trucks?.destination}</strong></span>
                   <span>{book.weight_kg} kg</span><strong>{taka(book.total_bdt)}</strong>
                 </div>)}
               </div>
