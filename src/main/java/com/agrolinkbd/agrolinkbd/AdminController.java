@@ -105,9 +105,8 @@ public class AdminController {
     }
 
     private void updateStats() {
-        try {
-            Connection conn = Database.connect(); Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT (SELECT COUNT(*) FROM users WHERE role='Farmer') as f, (SELECT COUNT(*) FROM users WHERE role='Buyer') as b, (SELECT COUNT(*) FROM orders) as o");
+        try (Connection conn = Database.connect(); Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT (SELECT COUNT(*) FROM users WHERE role='Farmer') as f, (SELECT COUNT(*) FROM users WHERE role='Buyer') as b, (SELECT COUNT(*) FROM orders) as o")) {
             if (rs.next()) {
                 totalFarmersLabel.setText(String.valueOf(rs.getInt("f")));
                 totalBuyersLabel.setText(String.valueOf(rs.getInt("b")));
@@ -116,6 +115,7 @@ public class AdminController {
         } catch (SQLException e) { e.printStackTrace(); }
     }
 
+    @FXML void handleManageOrders(ActionEvent event) { AgroLinkApp.sceneChange("OrderManagement.fxml", "Manage Orders", 900, 600); }
     @FXML void handleFilterUsers(ActionEvent event) { loadUsers(filterUserRole.getValue()); }
     @FXML void handleLogout(ActionEvent event) { UserSession.clearSession(); AgroLinkApp.sceneChange("Login.fxml", "Login", 600, 500); }
     @FXML void handleAddTruck(ActionEvent event) { AgroLinkApp.sceneChange("AddTruck.fxml", "Add Truck", 400, 300); }
