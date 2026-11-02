@@ -1,81 +1,89 @@
-<div align="center">
-  <img src="https://raw.githubusercontent.com/Toufiqul-27/portfolio-1/main/assets/github-banner.svg" alt="Toufiqul Islam developer banner" width="100%"/>
-</div>
-
----
-
 # AgroLink BD
 
-**AgroLink BD** is a JavaFX desktop application exploring how farmers, buyers and administrators can manage agricultural products, orders and shared truck bookings in one place.
+A JavaFX desktop app for local agricultural crop listings, buyer orders, and shared truck capacity bookings.
 
-> **Status:** Student project / local development. This repository is not a production-ready service.
+**Status:** Student project / local development. Not production ready.
 
-## Features in the codebase
+## Features
 
-- **Account flows:** registration, login and role-based screens.
-- **Farmer dashboard:** view, add and manage crop listings.
-- **Buyer dashboard:** browse produce, filter listings and place orders.
-- **Order management:** view orders and update statuses.
-- **Truck booking:** browse routes and capacity, estimate shared transport costs and manage bookings.
-- **Admin dashboard:** view users, orders and trucks.
+- Registration and role-based login (Farmer, Buyer, Arotdar, Admin)
+- Farmer crop listings, buyer orders and order management
+- Truck routes, cost calculations and capacity-safe bookings
+- Admin dashboard
+- Salted PBKDF2 password hashes for new users
 
-## Tech stack
+## Stack
 
-| Layer | Technology |
-| --- | --- |
-| Language | Java |
-| Desktop UI | JavaFX + FXML |
-| Database | MySQL (JDBC) |
-| Build tool | Maven |
-| Tests | JUnit dependencies configured in `pom.xml` |
+Java 21 LTS, JavaFX 21, Maven, MySQL 8.0.16+ and JDBC.
+
+## Run locally (Windows PowerShell)
+
+1. Install JDK 21 and MySQL 8.0+, and check Java with: java -version
+2. Create the local schema using MySQL Workbench to execute **database/schema.sql**, or from a terminal:
+
+~~~bash
+mysql -u root -p < database/schema.sql
+~~~
+
+3. Create a local MySQL user with appropriate access to agrolink_db. Set these environment variables in the SAME PowerShell terminal used to run the application:
+
+~~~powershell
+$env:AGROLINK_DB_USER = "your_local_mysql_user"
+$env:AGROLINK_DB_PASSWORD = "your_local_mysql_password"
+$env:AGROLINK_DB_URL = "jdbc:mysql://localhost:3306/agrolink_db"
+~~~
+
+4. From the repository root:
+
+~~~powershell
+.\mvnw.cmd clean test
+.\mvnw.cmd javafx:run
+~~~
+
+On Linux or macOS use export for these environment variables and ./mvnw for Maven.
+
+The schema creates tables when missing; it does NOT migrate an existing database. Back up existing data before making schema changes.
+
+## First-use flow
+
+Register a Farmer, Buyer or Arotdar account, then log in with the chosen role. Farmers can list crops, and buyers can order available products.
+
+Admin accounts cannot be created via public registration. If you need the admin dashboard locally, provision an authorized Admin account directly in the development database using a securely generated PBKDF2 password hash. There are deliberately no default administrator credentials. The schema also contains no demo users or trucks.
+
+## Data tables
+
+- users: account details, role, status, password hash
+- products: crop listings and remaining stock
+- orders: buyer orders and status
+- trucks: routes, departure dates and shared capacity
+- truck_bookings: truck reservations
+
+All defined in [database/schema.sql](database/schema.sql).
+
+## Security notes
+
+**Important:** A database credential was committed in an earlier revision. Rotate that MySQL password immediately and review exposure. Replacing it in the latest files does not erase the secret from Git history.
+
+Legacy rows may still contain plaintext passwords. Login temporarily verifies these and migrates them to PBKDF2 after a successful sign-in. For real users, require password resets and clean up legacy stored data. Never upload real credentials, NID datasets or database dumps.
+
+This code is for educational use; production security, privacy, deployment and end-to-end testing still need work.
+
+## Build verification
+
+The JUnit tests can be run with the Maven wrapper. To fully verify the UI, configure a local MySQL instance and manually test registration/login, crop listing, ordering and truck bookings. No real MySQL or JavaFX UI test run is claimed here.
 
 ## Project structure
 
-```text
-src/main/
-├── java/com/agrolinkbd/agrolinkbd/      # App, models, controllers, database access
-└── resources/com/agrolinkbd/agrolinkbd/ # FXML views and styles
-```
+~~~text
+src/main/java/com/agrolinkbd/agrolinkbd/          Application, controllers, models
+src/main/resources/com/agrolinkbd/agrolinkbd/     FXML views
+src/main/resources/com/agrolinkbd/css/            Styles
+src/test/java/com/agrolinkbd/agrolinkbd/          Unit tests
+database/schema.sql                               MySQL schema
+~~~
 
-## Running locally
+## Limitations
 
-1. Install **JDK 25**, **Maven** (or use the included Maven wrapper) and a local **MySQL** server. The project currently targets Java 25 in `pom.xml`.
-2. Create a local MySQL database named `agrolink_db` and configure the database tables used by the application. **A database schema/migration script is not yet included in this repository.**
-3. Set environment variables for the MySQL connection (do not commit the values):
+No live GPS, payment gateway, cloud deployment or formal security audit.
 
-   **PowerShell:**
-
-   ```powershell
-   $env:AGROLINK_DB_USER = "your_mysql_user"
-   $env:AGROLINK_DB_PASSWORD = "your_local_mysql_password"
-   $env:AGROLINK_DB_URL = "jdbc:mysql://localhost:3306/agrolink_db"
-   ```
-
-   **macOS / Linux:**
-
-   ```bash
-   export AGROLINK_DB_USER="your_mysql_user"
-   export AGROLINK_DB_PASSWORD="your_local_mysql_password"
-   export AGROLINK_DB_URL="jdbc:mysql://localhost:3306/agrolink_db"
-   ```
-
-4. From the repository root, run:
-
-```bash
-./mvnw clean javafx:run
-```
-
-On Windows PowerShell, use `./mvnw.cmd clean javafx:run`.
-
-**Security note:** Database credentials are now read from `AGROLINK_DB_USER`, `AGROLINK_DB_PASSWORD` and optional `AGROLINK_DB_URL`. A password was previously committed: **rotate it now**. Old commits may still expose it until repository history is carefully cleaned. Never commit real credentials.
-
-## What I want to improve
-
-- Add a reproducible database setup script.
-- Review and clean credential exposure in earlier Git history after rotating the password.
-- Improve form validation, automated tests and error handling.
-- Add screenshots and a short demo of the application workflow.
-
-## Author
-
-**Toufiqul Islam** — [GitHub profile](https://github.com/Toufiqul-27)
+**Author:** [Toufiqul Islam](https://github.com/Toufiqul-27)

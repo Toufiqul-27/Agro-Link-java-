@@ -37,3 +37,8 @@ build/
 
 ### Mac OS ###
 .DS_Store
+# Local-only secrets and database files
+.env
+.env.*
+*.local.sql
+*.sql.bak
