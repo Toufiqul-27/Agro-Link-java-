@@ -3,58 +3,71 @@ package com.agrolinkbd.agrolinkbd;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 public class RegisterController {
-
     @FXML private TextField nameField, nidField, phoneField, locationField;
     @FXML private ComboBox<String> roleCombo;
     @FXML private PasswordField passwordField, confirmPasswordField;
     @FXML private Label errorLabel;
 
-    @FXML
-    public void initialize() {
-
+    @FXML public void initialize() {
         roleCombo.getItems().addAll("Farmer", "Buyer", "Arotdar");
     }
 
-    @FXML
-    void handleRegister(ActionEvent event) {
+    @FXML void handleRegister(ActionEvent event) {
+        String name = nameField.getText().trim();
+        String nid = nidField.getText().trim();
+        String phone = phoneField.getText().trim();
+        String location = locationField.getText().trim();
+        String role = roleCombo.getValue();
+        String password = passwordField.getText();
 
-        if (!passwordField.getText().equals(confirmPasswordField.getText())) {
-            errorLabel.setText("Passwords do not match!");
+        if (name.isBlank() || nid.isBlank() || phone.isBlank()
+                || location.isBlank() || role == null || password.isBlank()) {
+            errorLabel.setText("Please complete all fields.");
+            return;
+        }
+        if (!phone.matches("01[3-9][0-9]{8}")) {
+            errorLabel.setText("Enter a valid 11-digit Bangladeshi phone number.");
+            return;
+        }
+        if (password.length() < 8) {
+            errorLabel.setText("Password must be at least 8 characters.");
+            return;
+        }
+        if (!password.equals(confirmPasswordField.getText())) {
+            errorLabel.setText("Passwords do not match.");
             return;
         }
 
-        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/agrolink_db", "root", "ovi@2327")) {
+        String sql = "INSERT INTO users (full_name, nid, phone, location, role, password_hash, status) "
+                + "VALUES (?, ?, ?, ?, ?, ?, 'Active')";
+        try (Connection conn = Database.connect();
+             PreparedStatement statement = conn.prepareStatement(sql)) {
+            statement.setString(1, name);
+            statement.setString(2, nid);
+            statement.setString(3, phone);
+            statement.setString(4, location);
+            statement.setString(5, role);
+            statement.setString(6, PasswordHasher.hash(password));
+            statement.executeUpdate();
 
-            String sql = "INSERT INTO users (full_name, nid, phone, location, role, password_hash, status) VALUES (?, ?, ?, ?, ?, ?, 'Active')";
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-
-            pstmt.setString(1, nameField.getText());
-            pstmt.setString(2, nidField.getText());
-            pstmt.setString(3, phoneField.getText());
-            pstmt.setString(4, locationField.getText());
-            pstmt.setString(5, roleCombo.getValue());
-            pstmt.setString(6, passwordField.getText());
-
-            pstmt.executeUpdate();
-
-
-            Alert alert = new Alert(Alert.AlertType.INFORMATION, "Registration Successful! Please login.");
-            alert.showAndWait();
-
-
+            new Alert(Alert.AlertType.INFORMATION,
+                    "Registration successful. Please sign in.").showAndWait();
             goToLogin(event);
-
         } catch (SQLException e) {
-            errorLabel.setText("Error: Phone or NID might already exist.");
+            errorLabel.setText("Registration failed. Phone or NID may already be registered.");
+            e.printStackTrace();
+        } catch (IllegalStateException e) {
+            errorLabel.setText("Database is not configured. See README.");
             e.printStackTrace();
         }
     }
 
-    @FXML
-    void goToLogin(ActionEvent event) {
+    @FXML void goToLogin(ActionEvent event) {
         AgroLinkApp.sceneChange("Login.fxml", "Login", 600, 500);
     }
 }
