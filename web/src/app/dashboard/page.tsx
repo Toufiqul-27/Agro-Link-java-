@@ -32,7 +32,7 @@ export default function Dashboard() {
   const [tab, setTab] = useState<Tab>("market");
   const [allListings, setAllListings] = useState<Listing[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
-  const [trucks, setTrucks] = useState<TruckIcon[]>([]);
+  const [trucks, setTrucks] = useState<Truck[]>([]);
   const [bookings, setBookings] = useState<TruckBooking[]>([]);
   const [cropForm, setCropForm] = useState(false);
   const [truckForm, setTruckForm] = useState(false);
