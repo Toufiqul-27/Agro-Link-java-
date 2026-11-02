@@ -15,6 +15,7 @@ public class AdminController {
 
     @FXML private TableView<User> usersTable, pendingFarmersTable;
     @FXML private TableColumn<User, Integer> colUserId, colFarmerId;
+    @FXML private TableColumn<User, String> colFarmerName, colFarmerNid, colFarmerPhone, colFarmerLocation, colFarmerDate;
     @FXML private TableColumn<User, String> colUserName, colUserPhone, colUserRole, colUserLocation, colUserStatus;
 
 
@@ -38,6 +39,12 @@ public class AdminController {
     }
 
     private void setupBindings() {
+        colFarmerId.setCellValueFactory(new PropertyValueFactory<>("id"));
+        colFarmerName.setCellValueFactory(new PropertyValueFactory<>("name"));
+        colFarmerNid.setCellValueFactory(new PropertyValueFactory<>("nid"));
+        colFarmerPhone.setCellValueFactory(new PropertyValueFactory<>("phone"));
+        colFarmerLocation.setCellValueFactory(new PropertyValueFactory<>("location"));
+        colFarmerDate.setCellValueFactory(new PropertyValueFactory<>("registeredOn"));
 
         colUserId.setCellValueFactory(new PropertyValueFactory<>("id"));
         colUserName.setCellValueFactory(new PropertyValueFactory<>("name"));
@@ -66,6 +73,7 @@ public class AdminController {
 
     private void loadAllData() {
         loadUsers("");
+        loadPendingFarmers();
         loadOrders();
         loadTrucks();
         updateStats();
@@ -80,6 +88,23 @@ public class AdminController {
             }
             usersTable.setItems(list);
         } catch (SQLException e) { e.printStackTrace(); }
+    }
+
+    private void loadPendingFarmers() {
+        ObservableList<User> pending = FXCollections.observableArrayList();
+        String sql = "SELECT * FROM users WHERE role = 'Farmer' AND status = 'Pending'";
+        try (Connection conn = Database.connect();
+             PreparedStatement statement = conn.prepareStatement(sql);
+             ResultSet rs = statement.executeQuery()) {
+            while (rs.next()) {
+                pending.add(new User(rs.getInt("id"), rs.getString("full_name"),
+                        rs.getString("nid"), rs.getString("phone"),
+                        rs.getString("location"), rs.getString("role"),
+                        rs.getString("status"), rs.getString("registered_on")));
+            }
+            pendingFarmersTable.setItems(pending);
+            pendingApprovalsLabel.setText(String.valueOf(pending.size()));
+        } catch (Exception e) { e.printStackTrace(); }
     }
 
     private void loadOrders() {
@@ -174,6 +199,7 @@ public class AdminController {
             pstmt.setInt(1, selected.getId());
             pstmt.executeUpdate();
             loadUsers("");
+            loadPendingFarmers();
         } catch (SQLException e) { e.printStackTrace(); }
     }
 
@@ -187,6 +213,7 @@ public class AdminController {
             pstmt.setInt(1, selected.getId());
             pstmt.executeUpdate();
             loadUsers("");
+            loadPendingFarmers();
         } catch (SQLException e) { e.printStackTrace(); }
     }
 }

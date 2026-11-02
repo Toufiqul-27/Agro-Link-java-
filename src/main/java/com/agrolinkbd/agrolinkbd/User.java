@@ -18,6 +18,8 @@ public class User {
 
     public int getId() { return id; }
     public String getName() { return name; }
+    public String getNid() { return nid; }
+    public String getRegisteredOn() { return registeredOn; }
     public String getPhone() { return phone; }
     public String getRole() { return role; }
     public String getLocation() { return location; }
