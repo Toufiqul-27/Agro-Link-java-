@@ -21,58 +21,52 @@ public class ProductFormController {
 
     @FXML void handleSave(ActionEvent event) {
         String type = cropTypeCombo.getValue();
-        String name = cropNameField.getText();
-        String qtyStr = quantityField.getText();
-        String priceStr = priceField.getText();
+        String name = cropNameField.getText().trim();
+        String location = pickupLocationField.getText().trim();
         LocalDate date = harvestDatePicker.getValue();
-        String location = pickupLocationField.getText();
-
-        if (type == null || name.isEmpty() || qtyStr.isEmpty() || priceStr.isEmpty()) {
-            errorLabel.setText("Please fill all required fields (*)!");
+        if (type == null || name.isBlank() || location.isBlank() || date == null) {
+            errorLabel.setText("Crop, type, pickup location and harvest date are required.");
             return;
         }
-
-        int qty;
+        if (UserSession.loggedInUserId <= 0 || !"Farmer".equals(UserSession.loggedInRole)) {
+            errorLabel.setText("Please sign in as a farmer.");
+            return;
+        }
+        int quantity;
         double price;
         try {
-            qty = Integer.parseInt(qtyStr);
-            price = Double.parseDouble(priceStr);
+            quantity = Integer.parseInt(quantityField.getText().trim());
+            price = Double.parseDouble(priceField.getText().trim());
+            if (quantity <= 0 || !Double.isFinite(price) || price <= 0)
+                throw new NumberFormatException();
         } catch (NumberFormatException e) {
-            errorLabel.setText("Quantity and Price must be valid numbers!");
+            errorLabel.setText("Quantity and price must be positive numbers.");
             return;
         }
 
+        String sql = "INSERT INTO products "
+                   + "(farmer_id, crop_type, crop_name, price_per_kg, stock_kg, "
+                   + "harvest_date, pickup_location, description) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        try (Connection conn = Database.connect();
+             PreparedStatement statement = conn.prepareStatement(sql)) {
+            statement.setInt(1, UserSession.loggedInUserId);
+            statement.setString(2, type);
+            statement.setString(3, name);
+            statement.setDouble(4, price);
+            statement.setInt(5, quantity);
+            statement.setDate(6, java.sql.Date.valueOf(date));
+            statement.setString(7, location);
+            statement.setString(8, descriptionArea.getText().trim());
+            statement.executeUpdate();
 
-        Connection conn = Database.connect();
-        String sql = "INSERT INTO products (farmer_id, crop_type, crop_name, price_per_kg, stock_kg, harvest_date, pickup_location, description) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-
-
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-            pstmt.setInt(1, UserSession.loggedInUserId);
-            pstmt.setString(2, type);
-            pstmt.setString(3, name);
-            pstmt.setDouble(4, price);
-            pstmt.setInt(5, qty);
-            pstmt.setDate(6, date != null ? java.sql.Date.valueOf(date) : null);
-            pstmt.setString(7, location);
-            pstmt.setString(8, descriptionArea.getText());
-
-            pstmt.executeUpdate();
-
-            Alert alert = new Alert(Alert.AlertType.INFORMATION, "Crop listed successfully!");
-            alert.showAndWait();
-
-
+            new Alert(Alert.AlertType.INFORMATION, "Crop listed successfully!").showAndWait();
             clearForm();
             errorLabel.setText("");
-
-        } catch (SQLException e) {
-            errorLabel.setText("Database error occurred!");
+        } catch (Exception e) {
+            errorLabel.setText("Cannot save crop. Check the database connection.");
             e.printStackTrace();
         }
     }
-
 
     private void clearForm() {
         cropTypeCombo.getSelectionModel().clearSelection();
@@ -85,7 +79,6 @@ public class ProductFormController {
     }
 
     @FXML void handleCancel(ActionEvent event) {
-
         AgroLinkApp.sceneChange("FarmerDashboard.fxml", "Farmer Dashboard", 900, 600);
     }
 }

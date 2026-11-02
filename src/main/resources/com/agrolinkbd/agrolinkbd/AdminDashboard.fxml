@@ -119,6 +119,7 @@
                     <content>
                         <VBox spacing="10.0">
                             <padding><Insets bottom="10.0" left="10.0" right="10.0" top="10.0" /></padding>
+                            <HBox alignment="CENTER_RIGHT"><Button text="Manage Order Status" onAction="#handleManageOrders" styleClass="primary-button" /></HBox>
                             <TableView fx:id="allOrdersTable" VBox.vgrow="ALWAYS" styleClass="table-view">
                                 <columns>
                                     <TableColumn fx:id="colOrderId" prefWidth="70.0" text="ID" />

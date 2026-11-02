@@ -2,6 +2,9 @@ package com.agrolinkbd.agrolinkbd;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 
 public class LoginController {
     @FXML private ComboBox<String> roleCombo;
@@ -14,42 +17,61 @@ public class LoginController {
     }
 
     @FXML void handleLogin() {
-        String phone = phoneField.getText();
-        String pass = passwordField.getText();
+        String phone = phoneField.getText().trim();
+        String password = passwordField.getText();
         String role = roleCombo.getValue();
-
-        if (phone.isEmpty() || pass.isEmpty() || role == null) {
-            errorLabel.setText("Fill all fields!");
+        if (phone.isBlank() || password.isBlank() || role == null) {
+            errorLabel.setText("Fill all fields.");
             return;
         }
 
-        String sql = "SELECT * FROM users WHERE phone = ? AND password_hash = ? AND role = ?";
-        try (var conn = Database.connect(); var pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, phone);
-            pstmt.setString(2, pass);
-            pstmt.setString(3, role);
+        String sql = "SELECT id, full_name, role, status, password_hash "
+                + "FROM users WHERE phone = ? AND role = ?";
+        try (Connection conn = Database.connect();
+             PreparedStatement statement = conn.prepareStatement(sql)) {
+            statement.setString(1, phone);
+            statement.setString(2, role);
 
-            var rs = pstmt.executeQuery();
-            if (rs.next()) {
-
-                UserSession.loggedInUserId = rs.getInt("id");
-
-                switch (role) {
-                    case "Admin" -> AgroLinkApp.sceneChange("AdminDashboard.fxml", "Admin", 1000, 700);
-                    case "Farmer" -> AgroLinkApp.sceneChange("ProductForm.fxml", "Farmer", 800, 600);
-                    case "Arotdar" -> AgroLinkApp.sceneChange("BuyerDashboard.fxml", "Arotdar Dashboard", 900, 700);
-                    case "Buyer" -> AgroLinkApp.sceneChange("BuyerDashboard.fxml", "Buyer", 900, 700);
+            try (ResultSet result = statement.executeQuery()) {
+                if (!result.next() || !PasswordHasher.verify(password, result.getString("password_hash"))) {
+                    errorLabel.setText("Invalid credentials.");
+                    return;
                 }
-            } else {
-                errorLabel.setText("Invalid credentials!");
+                if (!"Active".equals(result.getString("status"))) {
+                    errorLabel.setText("Your account is not active. Contact the administrator.");
+                    return;
+                }
+
+                int userId = result.getInt("id");
+                String stored = result.getString("password_hash");
+                if (!PasswordHasher.isHashed(stored)) {
+                    try (PreparedStatement upgrade = conn.prepareStatement(
+                            "UPDATE users SET password_hash = ? WHERE id = ? AND password_hash = ?")) {
+                        upgrade.setString(1, PasswordHasher.hash(password));
+                        upgrade.setInt(2, userId);
+                        upgrade.setString(3, stored);
+                        upgrade.executeUpdate();
+                    }
+                }
+                UserSession.loggedInUserId = userId;
+                UserSession.loggedInUserName = result.getString("full_name");
+                UserSession.loggedInRole = role;
+            }
+
+            switch (role) {
+                case "Admin" -> AgroLinkApp.sceneChange("AdminDashboard.fxml", "Admin", 1000, 700);
+                case "Farmer" -> AgroLinkApp.sceneChange("FarmerDashboard.fxml", "Farmer", 900, 600);
+                case "Buyer", "Arotdar" ->
+                        AgroLinkApp.sceneChange("BuyerDashboard.fxml", role + " Dashboard", 900, 700);
+                default -> errorLabel.setText("Invalid role.");
             }
         } catch (Exception e) {
-            errorLabel.setText("Database Error!");
+            errorLabel.setText("Unable to sign in. Check database setup.");
             e.printStackTrace();
         }
     }
 
     @FXML void goToRegister() {
-        AgroLinkApp.sceneChange("Register.fxml", "Register Account", 400, 500);
+        AgroLinkApp.sceneChange("Register.fxml", "Register Account", 500, 620);
     }
 }
